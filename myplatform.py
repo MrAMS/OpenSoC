@@ -113,16 +113,15 @@ _io = [
         IOStandard("LVCMOS33"),
     ),
 
-    # pins map follow Pmod Interface Type 2A (expanded SPI)
     ("spi0", 0,
         Subsignal("cs_n", Pins("T6")),
         Subsignal("mosi", Pins("R5")),
-        Subsignal("miso", Pins("R4")),
+        Subsignal("miso", Pins("P7")),
         Subsignal("clk",  Pins("R3")),
-        Subsignal("io0",  Pins("R7")),
-        Subsignal("io1",  Pins("R6")),
-        Subsignal("io2",  Pins("T4")),
-        Subsignal("io3",  Pins("T3")),
+        # Subsignal("io0",  Pins("R7")),
+        # Subsignal("io1",  Pins("R6")),
+        # Subsignal("io2",  Pins("T4")),
+        # Subsignal("io3",  Pins("T3")),
         IOStandard("LVCMOS33"),
     ),
 
@@ -143,6 +142,19 @@ _io = [
         Subsignal("io5", Pins("N1")),
         Subsignal("io6", Pins("M1")),
         Subsignal("io7", Pins("K1")),
+        # spi0 pmod gpio
+        Subsignal("io8",  Pins("R4")), # for LCD_DC
+        Subsignal("io9",  Pins("R6")),
+        Subsignal("io10",  Pins("T4")),
+        Subsignal("io11",  Pins("T3")),
+        # i2c0 pmod gpio
+        Subsignal("io12",  Pins("A5")),
+        Subsignal("io13",  Pins("A6")),
+        Subsignal("io14",  Pins("B5")),
+        Subsignal("io15",  Pins("B6")),
+        Subsignal("io16",  Pins("B7")),
+        Subsignal("io17",  Pins("B8")),
+
         IOStandard("LVCMOS33"),
     ),
 

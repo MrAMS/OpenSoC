@@ -91,6 +91,7 @@ static void help(void)
 #ifdef WITH_CXX
 	puts("hellocpp           - Hello C++");
 #endif
+	puts("lcd                - SPI-LCD demo");
 }
 
 /*-----------------------------------------------------------------------*/
@@ -160,6 +161,14 @@ static void hellocpp_cmd(void)
 }
 #endif
 
+extern void lcd(void);
+
+static void lcd_cmd(void)
+{
+	printf("LCD demo...\n");
+	lcd();
+}
+
 /*-----------------------------------------------------------------------*/
 /* Console service / Main                                                */
 /*-----------------------------------------------------------------------*/
@@ -188,6 +197,8 @@ static void console_service(void)
 	else if(strcmp(token, "hellocpp") == 0)
 		hellocpp_cmd();
 #endif
+	else if(strcmp(token, "lcd") == 0)
+		lcd_cmd();
 	prompt();
 }
 

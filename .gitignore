@@ -5,6 +5,8 @@ __pycache__
 /software/demo
 *.bin
 *.fbi
+compile_commands.json
+.cache/
 
 
 !/third_party/litex_setup.py
