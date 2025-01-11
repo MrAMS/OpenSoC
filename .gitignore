@@ -1,7 +1,10 @@
-/third_party
-/build
+/third_party/*
+build/
 /.venv
 __pycache__
 /software/demo
 *.bin
 *.fbi
+
+
+!/third_party/litex_setup.py
