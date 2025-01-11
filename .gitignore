@@ -1,0 +1,7 @@
+/third_party
+/build
+/.venv
+__pycache__
+/software/demo
+*.bin
+*.fbi
