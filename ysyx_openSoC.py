@@ -102,6 +102,7 @@ class BaseSoC(SoCCore):
         with_etherbone         = False,
         eth_ip                 = "192.168.1.50",
         eth_dynamic_ip         = False,
+        spi0_clk_freq          = 10e6,
         **kwargs):
         platform = myplatform.Platform(toolchain=toolchain)
 
@@ -153,7 +154,7 @@ class BaseSoC(SoCCore):
                 self.add_etherbone(phy=self.ethphy, ip_address=eth_ip)
 
         # SPI0
-        self.spi0 = SPIMaster(pads=platform.request("spi0"), data_width=32, sys_clk_freq=sys_clk_freq, spi_clk_freq=10e6)
+        self.spi0 = SPIMaster(pads=platform.request("spi0"), data_width=32, sys_clk_freq=sys_clk_freq, spi_clk_freq=spi0_clk_freq)
         
         # I2C0
         self.i2c0 = I2CMaster(pads=platform.request("i2c0"))
@@ -173,7 +174,7 @@ class BaseSoC(SoCCore):
 def main():
     from litex.build.parser import LiteXArgumentParser
     parser = LiteXArgumentParser(platform=myplatform.Platform, description="OpenSoC")
-    parser.add_target_argument("--sys-clk-freq", default=50e6, help="System clock frequency.")
+    parser.add_target_argument("--sys-clk-freq", default=50e6, type=float, help="System clock frequency.")
     sdopts = parser.target_group.add_mutually_exclusive_group()
     sdopts.add_argument("--with-spi-sdcard",         action="store_true",  help="Enable SPI-mode SDCard support.")
     sdopts.add_argument("--with-sdcard",             action="store_true",  help="Enable SDCard support.")
@@ -188,6 +189,8 @@ def main():
     ethopts.add_argument("--with-etherbone",        action="store_true",    help="Add EtherBone.")
     parser.add_target_argument("--eth-ip",          default="192.168.1.50", help="Etherbone IP address.")
     parser.add_target_argument("--eth-dynamic-ip",  action="store_true",    help="Enable dynamic Ethernet IP addresses setting.")
+    
+    parser.add_target_argument("--spi0-clk-freq",   default=10e6, type=float, help="SPI0 Clock Frequency.")
 
     args = parser.parse_args()
 
@@ -203,6 +206,7 @@ def main():
         with_etherbone         = args.with_etherbone,
         eth_ip                 = args.eth_ip,
         eth_dynamic_ip         = args.eth_dynamic_ip,
+        spi0_clk_freq          = args.spi0_clk_freq,
         **parser.soc_argdict
     )
     if args.with_spi_sdcard:
