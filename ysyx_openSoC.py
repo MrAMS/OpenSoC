@@ -123,15 +123,41 @@ class BaseSoC(SoCCore):
             from litespi.opcodes import SpiNorFlashOpCodes as Codes
             self.add_spi_flash(mode="1x", module=W25Q256(Codes.READ_1_1_1))
 
-        # SDR SDRAM --------------------------------------------------------------------------------
-        if not self.integrated_main_ram_size:
-            sdrphy_cls = HalfRateGENSDRPHY if sdram_rate == "1:2" else GENSDRPHY
-            self.sdrphy = sdrphy_cls(platform.request("sdram"))
-            self.add_sdram("sdram",
-                phy           = self.sdrphy,
-                module        = IS42S16160(sys_clk_freq, sdram_rate),
-                l2_cache_size = kwargs.get("l2_size", 8192)
-            )
+        # # SDR SDRAM --------------------------------------------------------------------------------
+        # if not self.integrated_main_ram_size:
+        #     sdrphy_cls = HalfRateGENSDRPHY if sdram_rate == "1:2" else GENSDRPHY
+        #     self.sdrphy = sdrphy_cls(platform.request("sdram"))
+        #     self.add_sdram("sdram",
+        #         phy           = self.sdrphy,
+        #         module        = IS42S16160(sys_clk_freq, sdram_rate),
+        #         l2_cache_size = kwargs.get("l2_size", 8192)
+        #     )
+        from litespi.spi_nor_flash_module import SpiNorFlashModule
+        from litespi.opcodes import SpiNorFlashOpCodes as Codes
+        class PSRAM(SpiNorFlashModule):
+            # ref https://gitlab.informatik.uni-bremen.de/fbrning/esp-idf/-/blob/6313ea00881f7d779c56e72085ca36218bb43cfd/components/esp32/spiram_psram.c
+            manufacturer_id =   0x000d          # FIXME ESP-PSRAM64H
+            device_id       =   0x9F
+            name            =   "ESP-PSRAM64H"
+            total_size      =   64*1024*1024    # bytes  # 64Mbit
+            page_size       =   1024            # bytes  # 1KB页大小
+            total_pages     =   total_size/page_size
+            supported_opcodes = [
+                Codes.READ_1_1_1,
+                Codes.READ_1_1_1_FAST,
+                Codes.READ_1_4_4,
+                Codes.PP_1_1_1,
+                Codes.PP_1_4_4,
+            ]
+            dummy_bits = 0x5 # FIXME 未验证正确性 参考：#define PSRAM_FAST_READ_QUAD_DUMMY 0x5
+        
+        self.add_spi_ram(name="psram", mode="4x", clk_freq=30e6, module=PSRAM(Codes.READ_1_4_4))
+        from litex.soc.integration.soc import SoCRegion
+        self.bus.add_region("main_ram", SoCRegion(
+            origin = self.bus.regions["psram"].origin,
+            size = self.bus.regions["psram"].size,
+            linker = True
+        ))
 
         # Video ------------------------------------------------------------------------------------
         if with_video_terminal or with_video_framebuffer:

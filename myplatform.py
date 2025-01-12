@@ -158,6 +158,13 @@ _io = [
         IOStandard("LVCMOS33"),
     ),
 
+    # pmod pins order: cs_n dq0 dq1 clk dq2 dq3
+    ("psram4x", 0,
+        Subsignal("cs_n", Pins("E1")),
+        Subsignal("dq",  Pins("C2", "B2", "F2", "D1")),
+        Subsignal("clk",  Pins("A2")),
+        IOStandard("LVCMOS33"),
+    ),
 
 
 ]
