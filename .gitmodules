@@ -1,0 +1,3 @@
+[submodule "software/GE0"]
+	path = software/GE0
+	url = git@github.com:MrAMS/GE0.git

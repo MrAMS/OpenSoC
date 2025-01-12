@@ -153,7 +153,7 @@ class BaseSoC(SoCCore):
                 self.add_etherbone(phy=self.ethphy, ip_address=eth_ip)
 
         # SPI0
-        self.spi0 = SPIMaster(pads=platform.request("spi0"), data_width=32, sys_clk_freq=sys_clk_freq, spi_clk_freq=5e6)
+        self.spi0 = SPIMaster(pads=platform.request("spi0"), data_width=32, sys_clk_freq=sys_clk_freq, spi_clk_freq=10e6)
         
         # I2C0
         self.i2c0 = I2CMaster(pads=platform.request("i2c0"))
