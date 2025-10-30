@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include <irq.h>
-#include <libbase/uart.h>
+#include <serial.h>
 
 #include <lcd.h>
 
@@ -13,8 +13,9 @@ void JOY_init(void){
 	irq_setmask(0);
 	irq_setie(1);
 #endif
-	uart_init();
+	serial_init();
     lcd_init();
+    lcd_fill(0, 0, LCD_W, LCD_H, LCD_COLOR_BLACK);
     printf("Ready to go\n");
 }
 
@@ -24,28 +25,58 @@ void JOY_OLED_end(void){
 
 static uint16_t draw_x, draw_y;
 
+const uint16_t x_start = (LCD_W-128)/2;
+const uint16_t y_start = (LCD_H-64)/2;
+const uint16_t joy_oled_w = 128;
+const uint16_t joy_oled_h = 64;
+
 void JOY_OLED_send(uint8_t data){
     draw_x++;
-    if(draw_x==128){
-        draw_x = 0;
+    if(draw_x == x_start + joy_oled_w){
+        draw_x = x_start;
         draw_y += 8;
     }
     for(int i=0;i<8;++i){
         lcd_draw_point(draw_x, draw_y+i, ((data>>i)&1)?LCD_COLOR_WHITE:LCD_COLOR_BLACK);
     }
 }
-
+/*
+    JOY OLED: SSD1306(128*64)
+*/
 void JOY_OLED_data_start(uint8_t page){
-    draw_x = 0;
-    draw_y = page*8;
+    draw_x = x_start;
+    draw_y = y_start + page*8;
 }
 
+static char serial_input=0;
+
+static char solve_serial(void){
+	char c = serial_readchar();
+    if(c!=0) serial_input = c;
+    return serial_input;
+}
+
+
+/**
+ * @brief to start game
+ * 
+ * @return uint8_t 
+ */
 uint8_t JOY_act_pressed(void){
-    return 1; // to start game
+    if(solve_serial() == 'j'){
+        serial_input = 0;
+        return 1;
+    }else{
+        return 0;
+    }
 }
 
 uint8_t JOY_act_released(void){
-    return 0;
+    if(solve_serial() != 'j'){
+        return 1;
+    }else{
+        return 0;
+    }
 }
 
 uint8_t JOY_pad_pressed(void){
@@ -61,7 +92,12 @@ uint8_t JOY_all_released(void){
 }
 
 uint8_t JOY_up_pressed(void) {
-    return 0;
+    if(solve_serial() == 'w'){
+        serial_input = 0;
+        return 1;
+    }else{
+        return 0;
+    }
     // TODO
     // uint16_t val = ADC_read();
     // return(   ((val > JOY_N  - JOY_DEV) && (val < JOY_N  + JOY_DEV))
@@ -70,7 +106,12 @@ uint8_t JOY_up_pressed(void) {
 }
 
 uint8_t JOY_down_pressed(void) {
-    return 0;
+    if(solve_serial() == 's'){
+        serial_input = 0;
+        return 1;
+    }else{
+        return 0;
+    }
     // TODO
     // uint16_t val = ADC_read();
     // return(   ((val > JOY_S  - JOY_DEV) && (val < JOY_S  + JOY_DEV))
@@ -79,7 +120,12 @@ uint8_t JOY_down_pressed(void) {
 }
 
 uint8_t JOY_left_pressed(void) {
-    return 0;
+    if(solve_serial() == 'a'){
+        serial_input = 0;
+        return 1;
+    }else{
+        return 0;
+    }
     // TODO
     // uint16_t val = ADC_read();
     // return(   ((val > JOY_W  - JOY_DEV) && (val < JOY_W  + JOY_DEV))
@@ -88,7 +134,12 @@ uint8_t JOY_left_pressed(void) {
 }
 
 uint8_t JOY_right_pressed(void) {
-    return 0;
+    if(solve_serial() == 'd'){
+        serial_input = 0;
+        return 1;
+    }else{
+        return 0;
+    }
     // TODO
     // uint16_t val = ADC_read();
     // return(   ((val > JOY_E  - JOY_DEV) && (val < JOY_E  + JOY_DEV))
